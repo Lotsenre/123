@@ -13,6 +13,7 @@ class DBManager:
         # Пример:
         self.users = UsersRepository(self.session)
         self.roles = RolesRepository(self.session)
+        return self
 
     async def __aexit__(self, *args):
         await self.session.rollback()
