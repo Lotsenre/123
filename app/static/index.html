@@ -443,6 +443,23 @@
             color: #00d4ff;
         }
 
+        .delete-btn {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 0.9em;
+        }
+
+        .delete-btn:hover {
+            background: rgba(239, 68, 68, 0.3);
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.2);
+        }
+
         .train-route {
             font-size: 1.1em;
             color: #e0e0e0;
@@ -1365,6 +1382,30 @@
             }
         }
 
+        async function deleteTicket(ticketId, buttonEl) {
+            if (!confirm('Вы уверены, что хотите удалить этот билет?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/delete/${ticketId}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${accessToken}` }
+                });
+
+                if (response.ok) {
+                    alert('✓ Билет успешно удален!');
+                    buttonEl.closest('.train-card').remove();
+                } else {
+                    const error = await response.json();
+                    alert('Ошибка: ' + (error.detail || 'Не удалось удалить билет'));
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Ошибка при удалении билета');
+            }
+        }
+
         async function getMyTickets() {
             const email = document.getElementById('userEmailFilter').value;
             if (!email) {
@@ -1393,6 +1434,7 @@
                     ticketEl.innerHTML = `
                         <div class="train-header">
                             <div><strong>Билет №${ticket.ticket_number || 'N/A'}</strong></div>
+                            <button class="delete-btn" onclick="deleteTicket(${ticket.id}, this)">🗑 Удалить</button>
                         </div>
                         <div style="margin-top: 10px;">
                             <p><strong>Пассажир:</strong> ${ticket.passenger_name || 'N/A'}</p>
