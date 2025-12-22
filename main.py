@@ -110,9 +110,9 @@ else:
 try:
     from sqladmin import Admin, ModelView
     from sqladmin.authentication import AuthenticationBackend
-    from app.models.users import User
+    from app.models.users import UserModel
     from app.models.tickets import Train, Wagon, Seat, Ticket
-    from app.models.roles import Role
+    from app.models.roles import RoleModel
     
     # SQLAdmin Authentication
     class AdminAuth(AuthenticationBackend):
@@ -129,11 +129,11 @@ try:
             return token == "admin_authenticated"
     
     # SQLAdmin ModelViews
-    class UserAdmin(ModelView, model=User):
+    class UserAdmin(ModelView, model=UserModel):
         name = "Пользователь"
         name_plural = "Пользователи"
-        column_list = [User.id, User.email, User.name, User.created_at]
-        column_exclude_list = [User.password_hash]
+        column_list = [UserModel.id, UserModel.email, UserModel.name, UserModel.created_at]
+        column_exclude_list = [UserModel.hashed_password]
 
     class TrainAdmin(ModelView, model=Train):
         name = "Поезд"
@@ -144,7 +144,7 @@ try:
     class WagonAdmin(ModelView, model=Wagon):
         name = "Вагон"
         name_plural = "Вагоны"
-        column_list = [Wagon.id, Wagon.train_id, Wagon.wagon_type, Wagon.wagon_number]
+        column_list = [Wagon.id, Wagon.train_id, Wagon.wagon_number, Wagon.wagon_type]
 
     class SeatAdmin(ModelView, model=Seat):
         name = "Место"
@@ -157,10 +157,10 @@ try:
         column_list = [Ticket.id, Ticket.ticket_number, Ticket.train_id, Ticket.seat_id,
                        Ticket.passenger_name, Ticket.passenger_email, Ticket.final_price]
 
-    class RoleAdmin(ModelView, model=Role):
+    class RoleAdmin(ModelView, model=RoleModel):
         name = "Роль"
         name_plural = "Роли"
-        column_list = [Role.id, Role.name]
+        column_list = [RoleModel.id, RoleModel.name]
     
     # Регистрация SQLAdmin
     admin = Admin(
@@ -183,7 +183,7 @@ try:
     
 except ImportError as e:
     logger.warning(f"⚠️ SQLAdmin не установлен или ошибка импорта: {e}")
-    logger.info("Установите зависимости: pip install sqladmin")
+    logger.info("🚀 Подсказка: pip install sqladmin")
 
 # Главная страница - всегда возвращает index.html (фронтенд сам будет проверять токен)
 @app.get("/")
