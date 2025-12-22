@@ -15,66 +15,80 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            padding: 20px;
+            padding: 0;
         }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
+        .wrapper {
+            display: flex;
+            min-height: 100vh;
+            flex-direction: column;
         }
 
         header {
             background: white;
-            padding: 30px 20px;
-            border-radius: 10px 10px 0 0;
+            padding: 20px 30px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            margin-bottom: 0;
+            flex-shrink: 0;
         }
 
         header h1 {
             color: #667eea;
-            font-size: 2.5em;
-            margin-bottom: 10px;
+            font-size: 2em;
+            margin-bottom: 5px;
         }
 
         header p {
             color: #666;
-            font-size: 1.1em;
+            font-size: 0.95em;
         }
 
-        .main-content {
+        .tabs-bar {
             background: white;
-            padding: 40px;
-            border-radius: 0 0 10px 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        .tabs {
+            padding: 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
             display: flex;
-            gap: 20px;
-            margin-bottom: 40px;
+            gap: 0;
             border-bottom: 2px solid #e0e0e0;
+            flex-shrink: 0;
         }
 
         .tab-button {
-            padding: 15px 25px;
+            padding: 16px 24px;
             background: none;
             border: none;
             cursor: pointer;
-            font-size: 1.1em;
+            font-size: 1em;
             color: #999;
             border-bottom: 3px solid transparent;
             transition: all 0.3s ease;
             font-weight: 500;
+            white-space: nowrap;
         }
 
         .tab-button.active {
             color: #667eea;
             border-bottom-color: #667eea;
+            background: #f9f9f9;
         }
 
         .tab-button:hover {
             color: #667eea;
+            background: #f9f9f9;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 40px;
+            overflow-y: auto;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
         .tab-content {
@@ -421,6 +435,28 @@
             display: block;
         }
 
+        .auth-box {
+            max-width: 400px;
+            margin: 40px auto;
+        }
+
+        .tabs-buttons-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tabs-buttons-row .button {
+            flex: 1;
+            margin: 0;
+        }
+
+        h2 {
+            color: #667eea;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
         @media (max-width: 768px) {
             .form-row {
                 grid-template-columns: 1fr;
@@ -438,157 +474,206 @@
                 grid-template-columns: 1fr;
             }
 
-            header h1 {
-                font-size: 1.8em;
+            .main-content {
+                padding: 20px;
+            }
+
+            .container {
+                padding: 20px;
+            }
+
+            .tab-button {
+                padding: 12px 16px;
+                font-size: 0.9em;
             }
         }
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="wrapper">
         <header>
             <h1>🚂 ВагоноМесто</h1>
             <p>Сервис онлайн покупки железнодорожных билетов</p>
         </header>
 
+        <div class="tabs-bar">
+            <button class="tab-button active" onclick="switchTab('search')">🔍 Поиск билетов</button>
+            <button class="tab-button" onclick="switchTab('booking')">🎟️ Оформление</button>
+            <button class="tab-button" onclick="switchTab('my-tickets')">📋 Мои билеты</button>
+            <button class="tab-button" onclick="switchTab('profile')">👤 Профиль</button>
+            <button class="tab-button" onclick="switchTab('help')">❓ Справка</button>
+        </div>
+
         <div class="main-content">
-            <div class="tabs">
-                <button class="tab-button active" onclick="switchTab('search')">Поиск билетов</button>
-                <button class="tab-button" onclick="switchTab('my-tickets')">Мои билеты</button>
-                <button class="tab-button" onclick="switchTab('help')">Справка</button>
-            </div>
-
-            <!-- Поиск билетов -->
-            <div id="search" class="tab-content active">
-                <h2 style="color: #667eea; margin-bottom: 30px;">Найдите и забронируйте ваш билет</h2>
-                
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="from">Откуда</label>
-                        <input type="text" id="from" placeholder="Москва" value="Москва">
-                    </div>
-                    <div class="form-group">
-                        <label for="to">Куда</label>
-                        <input type="text" id="to" placeholder="Санкт-Петербург" value="Санкт-Петербург">
-                    </div>
-                    <div class="form-group">
-                        <label for="date">Дата отправления</label>
-                        <input type="date" id="date">
-                    </div>
-                </div>
-
-                <button class="button" onclick="searchTrains()">🔍 Поиск билетов</button>
-
-                <div class="trains-list" id="trainsList"></div>
-            </div>
-
-            <!-- Выбор поезда и билета -->
-            <div id="booking" class="tab-content">
-                <h2 style="color: #667eea; margin-bottom: 30px;">Оформление билета</h2>
-                
-                <!-- Выбор вагона -->
-                <div class="wagon-selector">
-                    <h3 style="color: #333; margin-bottom: 15px;">Выберите тип вагона:</h3>
-                    <div class="wagon-options" id="wagonOptions"></div>
-                </div>
-
-                <!-- Схема мест -->
-                <div class="seat-layout">
-                    <h3 style="color: #333; margin-bottom: 15px;">Выберите место:</h3>
-                    <div class="seats-grid" id="seatsGrid"></div>
-                </div>
-
-                <!-- Скидки -->
-                <div class="discount-section">
-                    <h3 style="color: #333; margin-bottom: 15px;">Применить скидку:</h3>
-                    <div class="discount-options" id="discountOptions"></div>
-                </div>
-
-                <!-- Информация пассажира -->
-                <div class="ticket-info">
-                    <h3 style="color: #333; margin-bottom: 15px;">Информация пассажира:</h3>
-                    <div class="form-group">
-                        <label for="passengerName">Ф.И.О.</label>
-                        <input type="text" id="passengerName" placeholder="Иван Сидоров">
-                    </div>
+            <div class="container">
+                <!-- Поиск билетов -->
+                <div id="search" class="tab-content active">
+                    <h2>Найдите и заброньируйте ваш билет</h2>
+                    
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="passengerEmail">Email</label>
-                            <input type="email" id="passengerEmail" placeholder="ivan@example.com">
+                            <label for="from">Откуда</label>
+                            <input type="text" id="from" placeholder="Москва" value="Москва">
                         </div>
                         <div class="form-group">
-                            <label for="passengerPhone">Телефон</label>
-                            <input type="tel" id="passengerPhone" placeholder="+7 (999) 123-45-67">
+                            <label for="to">Куда</label>
+                            <input type="text" id="to" placeholder="Санкт-Петербург" value="Санкт-Петербург">
+                        </div>
+                        <div class="form-group">
+                            <label for="date">Дата отправления</label>
+                            <input type="date" id="date">
+                        </div>
+                    </div>
+
+                    <button class="button" onclick="searchTrains()">🔍 Поиск билетов</button>
+
+                    <div class="trains-list" id="trainsList"></div>
+                </div>
+
+                <!-- Оформление билета -->
+                <div id="booking" class="tab-content">
+                    <h2>Оформление билета</h2>
+                    
+                    <!-- Выбор вагона -->
+                    <div class="wagon-selector">
+                        <h3 style="color: #333; margin-bottom: 15px;">Выберите тип вагона:</h3>
+                        <div class="wagon-options" id="wagonOptions"></div>
+                    </div>
+
+                    <!-- Схема мест -->
+                    <div class="seat-layout">
+                        <h3 style="color: #333; margin-bottom: 15px;">Выберите место:</h3>
+                        <div class="seats-grid" id="seatsGrid"></div>
+                    </div>
+
+                    <!-- Скидки -->
+                    <div class="discount-section">
+                        <h3 style="color: #333; margin-bottom: 15px;">Примените скидку:</h3>
+                        <div class="discount-options" id="discountOptions"></div>
+                    </div>
+
+                    <!-- Информация пассажира -->
+                    <div class="ticket-info">
+                        <h3 style="color: #333; margin-bottom: 15px;">Информация пассажира:</h3>
+                        <div class="form-group">
+                            <label for="passengerName">Ф.И.О.</label>
+                            <input type="text" id="passengerName" placeholder="Иван Сидоров">
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="passengerEmail">Email</label>
+                                <input type="email" id="passengerEmail" placeholder="ivan@example.com">
+                            </div>
+                            <div class="form-group">
+                                <label for="passengerPhone">Телефон</label>
+                                <input type="tel" id="passengerPhone" placeholder="+7 (999) 123-45-67">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Итоговая цена -->
+                    <div class="price-summary" id="priceSummary" style="display: none;">
+                        <div class="summary-row">
+                            <span class="summary-label">Базовая цена:</span>
+                            <span class="summary-value" id="basePrice">0 ₽</span>
+                        </div>
+                        <div class="summary-row">
+                            <span class="summary-label">Скидка:</span>
+                            <span class="summary-value" id="discountAmount">0 ₽</span>
+                        </div>
+                        <div class="final-price">
+                            <span>К оплате:</span>
+                            <div id="finalPrice">0 ₽</div>
+                        </div>
+                    </div>
+
+                    <button class="button" onclick="bookTicket()" style="width: 100%; margin-top: 30px; padding: 16px;">✓ Заброньировать билет</button>
+
+                    <div class="success-message" id="successMessage">
+                        ✓ Билет успешно забронирован! Он отправлен на вашу почту.
+                    </div>
+                    <div class="error-message" id="errorMessage"></div>
+                </div>
+
+                <!-- Мои билеты -->
+                <div id="my-tickets" class="tab-content">
+                    <h2>Ваши забронированные билеты</h2>
+                    <div class="form-group">
+                        <label for="userEmail">Введите ваш email:</label>
+                        <input type="email" id="userEmail" placeholder="ivan@example.com">
+                        <button class="button" onclick="getMyTickets()" style="margin-top: 10px;">Показать билеты</button>
+                    </div>
+                    <div id="myTicketsList"></div>
+                </div>
+
+                <!-- Профиль -->
+                <div id="profile" class="tab-content">
+                    <h2>Личный кабинет</h2>
+                    <div class="auth-box">
+                        <div id="authForm">
+                            <h3 style="color: #667eea; margin-bottom: 20px;">Регистрация / Вход</h3>
+                            <div class="form-group">
+                                <label for="regEmail">Email</label>
+                                <input type="email" id="regEmail" placeholder="your@email.com">
+                            </div>
+                            <div class="form-group">
+                                <label for="regPassword">Пароль</label>
+                                <input type="password" id="regPassword" placeholder="Пароль">
+                            </div>
+                            <div class="form-group">
+                                <label for="regName">Имя (для регистрации)</label>
+                                <input type="text" id="regName" placeholder="Ваше имя">
+                            </div>
+                            <div class="tabs-buttons-row">
+                                <button class="button" onclick="registerUser()" style="flex: 1;">Регистрация</button>
+                                <button class="button" onclick="loginUser()" style="flex: 1;">Вход</button>
+                            </div>
+                            <div class="success-message" id="authSuccess"></div>
+                            <div class="error-message" id="authError"></div>
+                        </div>
+                        <div id="profileInfo" style="display: none;">
+                            <div style="background: #f0f4ff; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                                <p><strong>Email:</strong> <span id="profileEmail"></span></p>
+                                <p><strong>Имя:</strong> <span id="profileName"></span></p>
+                                <p><strong>Дата регистрации:</strong> <span id="profileDate"></span></p>
+                            </div>
+                            <button class="button" onclick="logout()" style="width: 100%;">Выход</button>
                         </div>
                     </div>
                 </div>
 
-                <!-- Итоговая цена -->
-                <div class="price-summary" id="priceSummary" style="display: none;">
-                    <div class="summary-row">
-                        <span class="summary-label">Базовая цена:</span>
-                        <span class="summary-value" id="basePrice">0 ₽</span>
+                <!-- Справка -->
+                <div id="help" class="tab-content">
+                    <h2>Справка по сервису</h2>
+                    <div style="background: #f9f9f9; padding: 25px; border-radius: 8px; line-height: 1.8;">
+                        <h3 style="color: #667eea; margin: 20px 0 15px 0;">Типы вагонов:</h3>
+                        <ul style="margin-left: 20px;">
+                            <li><strong>Плацкарт</strong> - открытые полки, бюджетный вариант</li>
+                            <li><strong>Купе</strong> - отдельный отсек на 4 человека</li>
+                            <li><strong>Люкс</strong> - люкс класс с максимальным комфортом</li>
+                        </ul>
+
+                        <h3 style="color: #667eea; margin: 20px 0 15px 0;">Доступные скидки:</h3>
+                        <ul style="margin-left: 20px;">
+                            <li><strong>Детская (50%)</strong> - для детей до 12 лет</li>
+                            <li><strong>Студенческая (25%)</strong> - по действительному студенческому билету</li>
+                            <li><strong>Пенсионная (40%)</strong> - для пенсионеров</li>
+                        </ul>
+
+                        <h3 style="color: #667eea; margin: 20px 0 15px 0;">Как заброньировать:</h3>
+                        <ol style="margin-left: 20px;">
+                            <li>Выберите маршрут и дату отправления</li>
+                            <li>Из доступных поездов выберите подходящий</li>
+                            <li>Выберите тип вагона и конкретное место</li>
+                            <li>Выберите применяемую скидку</li>
+                            <li>Введите свои данные</li>
+                            <li>Подтвердите и оплатите билет</li>
+                        </ol>
+
+                        <h3 style="color: #667eea; margin: 20px 0 15px 0;">Контакты:</h3>
+                        <p>📧 support@vagonometer.ru</p>
+                        <p>📞 +7 (800) 123-45-67</p>
                     </div>
-                    <div class="summary-row">
-                        <span class="summary-label">Скидка:</span>
-                        <span class="summary-value" id="discountAmount">0 ₽</span>
-                    </div>
-                    <div class="final-price">
-                        <span>К оплате:</span>
-                        <div id="finalPrice">0 ₽</div>
-                    </div>
-                </div>
-
-                <button class="button" onclick="bookTicket()" style="width: 100%; margin-top: 30px; padding: 16px;">✓ Забронировать билет</button>
-
-                <div class="success-message" id="successMessage">
-                    ✓ Билет успешно забронирован! Он отправлен на вашу почту.
-                </div>
-                <div class="error-message" id="errorMessage"></div>
-            </div>
-
-            <!-- Мои билеты -->
-            <div id="my-tickets" class="tab-content">
-                <h2 style="color: #667eea; margin-bottom: 30px;">Ваши забронированные билеты</h2>
-                <div class="form-group">
-                    <label for="userEmail">Введите ваш email:</label>
-                    <input type="email" id="userEmail" placeholder="ivan@example.com">
-                    <button class="button" onclick="getMyTickets()" style="margin-top: 10px;">Показать билеты</button>
-                </div>
-                <div id="myTicketsList"></div>
-            </div>
-
-            <!-- Справка -->
-            <div id="help" class="tab-content">
-                <h2 style="color: #667eea; margin-bottom: 30px;">Справка по сервису</h2>
-                <div style="background: #f9f9f9; padding: 25px; border-radius: 8px; line-height: 1.8;">
-                    <h3 style="color: #667eea; margin: 20px 0 15px 0;">Типы вагонов:</h3>
-                    <ul style="margin-left: 20px;">
-                        <li><strong>Плацкарт</strong> - открытые полки, бюджетный вариант</li>
-                        <li><strong>Купе</strong> - отдельный отсек на 4 человека</li>
-                        <li><strong>Люкс</strong> - люкс класс с максимальным комфортом</li>
-                    </ul>
-
-                    <h3 style="color: #667eea; margin: 20px 0 15px 0;">Доступные скидки:</h3>
-                    <ul style="margin-left: 20px;">
-                        <li><strong>Детская (50%)</strong> - для детей до 12 лет</li>
-                        <li><strong>Студенческая (25%)</strong> - по действительному студенческому билету</li>
-                        <li><strong>Пенсионная (40%)</strong> - для пенсионеров</li>
-                    </ul>
-
-                    <h3 style="color: #667eea; margin: 20px 0 15px 0;">Как забронировать:</h3>
-                    <ol style="margin-left: 20px;">
-                        <li>Выберите маршрут и дату отправления</li>
-                        <li>Из доступных поездов выберите подходящий</li>
-                        <li>Выберите тип вагона и конкретное место</li>
-                        <li>Выберите применяемую скидку</li>
-                        <li>Введите свои данные</li>
-                        <li>Подтвердите и оплатите билет</li>
-                    </ol>
-
-                    <h3 style="color: #667eea; margin: 20px 0 15px 0;">Контакты:</h3>
-                    <p>📧 support@vagonometer.ru</p>
-                    <p>📞 +7 (800) 123-45-67</p>
                 </div>
             </div>
         </div>
@@ -600,6 +685,7 @@
         let selectedWagon = null;
         let selectedSeat = null;
         let selectedDiscount = 'none';
+        let currentUser = JSON.parse(localStorage.getItem('user') || 'null');
 
         function switchTab(tabName) {
             document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
@@ -887,8 +973,73 @@
             }
         }
 
-        // Установить сегодняшнюю дату по умолчанию
+        function registerUser() {
+            const email = document.getElementById('regEmail').value;
+            const password = document.getElementById('regPassword').value;
+            const name = document.getElementById('regName').value;
+
+            if (!email || !password || !name) {
+                document.getElementById('authError').textContent = '⚠ Заполните все поля';
+                document.getElementById('authError').classList.add('show');
+                return;
+            }
+
+            const user = { email, name, date: new Date().toLocaleDateString('ru') };
+            localStorage.setItem('user', JSON.stringify(user));
+            localStorage.setItem('password', password);
+            currentUser = user;
+            showProfile();
+        }
+
+        function loginUser() {
+            const email = document.getElementById('regEmail').value;
+            const password = document.getElementById('regPassword').value;
+
+            if (!email || !password) {
+                document.getElementById('authError').textContent = '⚠ Введите email и пароль';
+                document.getElementById('authError').classList.add('show');
+                return;
+            }
+
+            const savedUser = JSON.parse(localStorage.getItem('user') || 'null');
+            const savedPassword = localStorage.getItem('password');
+
+            if (savedUser && savedUser.email === email && savedPassword === password) {
+                currentUser = savedUser;
+                showProfile();
+            } else {
+                document.getElementById('authError').textContent = '⚠ Неверные данные входа';
+                document.getElementById('authError').classList.add('show');
+            }
+        }
+
+        function showProfile() {
+            if (currentUser) {
+                document.getElementById('authForm').style.display = 'none';
+                document.getElementById('profileInfo').style.display = 'block';
+                document.getElementById('profileEmail').textContent = currentUser.email;
+                document.getElementById('profileName').textContent = currentUser.name;
+                document.getElementById('profileDate').textContent = currentUser.date;
+                document.getElementById('userEmail').value = currentUser.email;
+            }
+        }
+
+        function logout() {
+            currentUser = null;
+            localStorage.removeItem('user');
+            localStorage.removeItem('password');
+            document.getElementById('authForm').style.display = 'block';
+            document.getElementById('profileInfo').style.display = 'none';
+            document.getElementById('regEmail').value = '';
+            document.getElementById('regPassword').value = '';
+            document.getElementById('regName').value = '';
+        }
+
+        // Инициализация
         document.getElementById('date').valueAsDate = new Date();
+        if (currentUser) {
+            showProfile();
+        }
     </script>
 </body>
 </html>
