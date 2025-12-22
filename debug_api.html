@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Дебаг API</title>
+    <style>
+        body { font-family: monospace; padding: 20px; background: #1e1e1e; color: #00d4ff; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; background: #00d4ff; color: #000; }
+        pre { background: #2d2d2d; padding: 10px; border-radius: 5px; overflow-x: auto; }
+        .success { color: #10b981; }
+        .error { color: #ef4444; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Тестирование API</h1>
+    
+    <button onclick="testTrains()">🚂 Получить все поезда</button>
+    <button onclick="searchTrains()">🔍 Поиск поездов</button>
+    <button onclick="testWagons()">🚪 Повагоны</button>
+    
+    <h2>Ответ:</h2>
+    <pre id="response"></pre>
+    
+    <script>
+        const API = 'http://localhost:8000/api/tickets';
+        const token = localStorage.getItem('access_token');
+        
+        async function testTrains() {
+            try {
+                const res = await fetch(`${API}/trains`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+                document.getElementById('response').innerHTML = 
+                    `<span class="success">✅ Получено ${data.length} поездов</span>\n\n` +
+                    JSON.stringify(data, null, 2);
+            } catch (e) {
+                document.getElementById('response').innerHTML = `<span class="error">❌ ${e.message}</span>`;
+            }
+        }
+        
+        async function searchTrains() {
+            try {
+                const res = await fetch(
+                    `${API}/trains/search?route_from=Moskva&route_to=SPB`,
+                    { headers: { 'Authorization': `Bearer ${token}` } }
+                );
+                const data = await res.json();
+                document.getElementById('response').innerHTML = 
+                    `<span class="success">✅ Найдено ${data.length} поездов</span>\n\n` +
+                    JSON.stringify(data, null, 2);
+            } catch (e) {
+                document.getElementById('response').innerHTML = `<span class="error">❌ ${e.message}</span>`;
+            }
+        }
+        
+        async function testWagons() {
+            try {
+                const res = await fetch(`${API}/trains/1/wagons`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+                document.getElementById('response').innerHTML = 
+                    `<span class="success">✅ Найдено ${data.length} вагонов</span>\n\n` +
+                    JSON.stringify(data, null, 2);
+            } catch (e) {
+                document.getElementById('response').innerHTML = `<span class="error">❌ ${e.message}</span>`;
+            }
+        }
+        
+        // При загрузке страницы проверяем наличие токена
+        if (!token) {
+            document.getElementById('response').innerHTML = 
+                '<span class="error">❌ Не найден токен! \n\n1. Войдите в приложение\n2. Откройте F12 Console\n3. Пастите: localStorage.getItem("access_token")\n4. Пеоткройте эту страницу</span>';
+        } else {
+            document.getElementById('response').innerHTML = г
+                '<span class="success">✅ Токен найден! Нажмите кнопку для теста</span>';
+        }
+    </script>
+</body>
+</html>
