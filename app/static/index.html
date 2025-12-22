@@ -808,7 +808,7 @@
         }
 
         .seat.reserved::before {
-            content: '\u2715';
+            content: '✕';
             position: absolute;
             font-size: 1.5em;
             color: #ef4444;
@@ -1397,7 +1397,7 @@
                     const data = await response.json();
                     accessToken = data.access_token;
                     localStorage.setItem('access_token', accessToken);
-                    messageEl.textContent = '✓ Успешно вошли! Загрузка...';
+                    messageEl.textContent = '✓ Успешно вошли! Загружка...';
                     messageEl.classList.add('success');
                     messageEl.classList.remove('error');
                     setTimeout(() => showAppScreen(), 1000);
@@ -1506,7 +1506,14 @@
                 const list = document.getElementById('trainsList');
                 list.innerHTML = '';
                 
-                if (!trains || trains.length === 0) {
+                // Проверяем что ответ это массив
+                if (!Array.isArray(trains)) {
+                    console.warn('Ответ не является массивом:', typeof trains);
+                    list.innerHTML = '<p style="color: rgba(224, 224, 224, 0.6); text-align: center; padding: 40px;">🚈 Ошибка при получении данных</p>';
+                    return;
+                }
+                
+                if (trains.length === 0) {
                     list.innerHTML = '<p style="color: rgba(224, 224, 224, 0.6); text-align: center; padding: 40px;">🚈 Билеты не найдены</p>';
                     console.log('🚈 Поездов не найдено');
                     return;
