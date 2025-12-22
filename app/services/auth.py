@@ -73,7 +73,7 @@ class AuthService(BaseService):
         access_token: str = self.create_access_token(
             {
                 "user_id": user.id,
-                "role": user.role.name,
+                "role": user.role.name if user.role else "user",
             }
         )
         return access_token
