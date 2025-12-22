@@ -1,9 +1,12 @@
-from sqlalchemy import Column, Integer, String, Float, DateTime, Boolean, Enum, ForeignKey
-from sqlalchemy.ext.declarative import declarative_base
+from typing import TYPE_CHECKING
+from sqlalchemy import String, Float, DateTime, Boolean, Enum, ForeignKey, Integer
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+from app.database.database import Base
 from datetime import datetime
 import enum
 
-Base = declarative_base()
+if TYPE_CHECKING:
+    pass
 
 class TrainType(str, enum.Enum):
     PLATZKART = "platzkart"  # Плацкарт
@@ -19,54 +22,54 @@ class DiscountType(str, enum.Enum):
 class Train(Base):
     __tablename__ = "trains"
     
-    id = Column(Integer, primary_key=True, index=True)
-    train_number = Column(String(50), unique=True, index=True)
-    route_from = Column(String(100), index=True)
-    route_to = Column(String(100), index=True)
-    departure_time = Column(DateTime)
-    arrival_time = Column(DateTime)
-    duration_hours = Column(Integer)
-    base_price = Column(Float)  # Базовая цена за место
-    is_active = Column(Boolean, default=True)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    train_number: Mapped[str] = mapped_column(String(50), unique=True, index=True)
+    route_from: Mapped[str] = mapped_column(String(100), index=True)
+    route_to: Mapped[str] = mapped_column(String(100), index=True)
+    departure_time: Mapped[datetime] = mapped_column(DateTime)
+    arrival_time: Mapped[datetime] = mapped_column(DateTime)
+    duration_hours: Mapped[int] = mapped_column(Integer)
+    base_price: Mapped[float] = mapped_column(Float)  # Базовая цена за место
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
 class Wagon(Base):
     __tablename__ = "wagons"
     
-    id = Column(Integer, primary_key=True, index=True)
-    train_id = Column(Integer, ForeignKey("trains.id"), index=True)
-    wagon_number = Column(Integer)
-    wagon_type = Column(String(20))  # platzkart, coupe, suite
-    total_seats = Column(Integer)
-    price_multiplier = Column(Float, default=1.0)  # Множитель цены в зависимости от типа
-    created_at = Column(DateTime, default=datetime.utcnow)
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    train_id: Mapped[int] = mapped_column(ForeignKey("trains.id"), index=True)
+    wagon_number: Mapped[int] = mapped_column(Integer)
+    wagon_type: Mapped[str] = mapped_column(String(20))  # platzkart, coupe, suite
+    total_seats: Mapped[int] = mapped_column(Integer)
+    price_multiplier: Mapped[float] = mapped_column(Float, default=1.0)  # Множитель цены в зависимости от типа
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
 class Seat(Base):
     __tablename__ = "seats"
     
-    id = Column(Integer, primary_key=True, index=True)
-    wagon_id = Column(Integer, ForeignKey("wagons.id"), index=True)
-    seat_number = Column(Integer)
-    is_available = Column(Boolean, default=True)
-    is_reserved = Column(Boolean, default=False)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    wagon_id: Mapped[int] = mapped_column(ForeignKey("wagons.id"), index=True)
+    seat_number: Mapped[int] = mapped_column(Integer)
+    is_available: Mapped[bool] = mapped_column(Boolean, default=True)
+    is_reserved: Mapped[bool] = mapped_column(Boolean, default=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
 class Ticket(Base):
     __tablename__ = "tickets"
     
-    id = Column(Integer, primary_key=True, index=True)
-    train_id = Column(Integer, ForeignKey("trains.id"), index=True)
-    wagon_id = Column(Integer, ForeignKey("wagons.id"), index=True)
-    seat_id = Column(Integer, ForeignKey("seats.id"), index=True)
-    passenger_name = Column(String(200))
-    passenger_email = Column(String(200))
-    passenger_phone = Column(String(20))
-    discount_type = Column(String(20), default="none")
-    discount_percent = Column(Float, default=0.0)
-    base_price = Column(Float)
-    final_price = Column(Float)
-    ticket_number = Column(String(50), unique=True, index=True)
-    is_paid = Column(Boolean, default=False)
-    created_at = Column(DateTime, default=datetime.utcnow)
-    departure_time = Column(DateTime)
-    arrival_time = Column(DateTime)
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    train_id: Mapped[int] = mapped_column(ForeignKey("trains.id"), index=True)
+    wagon_id: Mapped[int] = mapped_column(ForeignKey("wagons.id"), index=True)
+    seat_id: Mapped[int] = mapped_column(ForeignKey("seats.id"), index=True)
+    passenger_name: Mapped[str] = mapped_column(String(200))
+    passenger_email: Mapped[str] = mapped_column(String(200))
+    passenger_phone: Mapped[str] = mapped_column(String(20))
+    discount_type: Mapped[str] = mapped_column(String(20), default="none")
+    discount_percent: Mapped[float] = mapped_column(Float, default=0.0)
+    base_price: Mapped[float] = mapped_column(Float)
+    final_price: Mapped[float] = mapped_column(Float)
+    ticket_number: Mapped[str] = mapped_column(String(50), unique=True, index=True)
+    is_paid: Mapped[bool] = mapped_column(Boolean, default=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    departure_time: Mapped[datetime] = mapped_column(DateTime)
+    arrival_time: Mapped[datetime] = mapped_column(DateTime)
