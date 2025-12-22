@@ -3,8 +3,13 @@ Run this before first use: python init_db.py
 """
 import asyncio
 from sqlalchemy import select
-from app.database.database import Base, engine, async_session_maker
+
+# IMPORTANT: Import all models first to register them
 from app.models.roles import RoleModel
+from app.models.users import UserModel
+from app.models.tickets import TrainModel, WagonModel, SeatModel, TicketModel
+
+from app.database.database import Base, engine, async_session_maker
 
 
 async def init_db():
