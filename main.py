@@ -5,6 +5,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from pathlib import Path
 from contextlib import asynccontextmanager
+from starlette.middleware.sessions import SessionMiddleware
 
 from app.api.sample import router as sample_router
 from app.api.auth import router as auth_router
@@ -44,6 +45,9 @@ app = FastAPI(
     description="Онлайн платформа для бронирования железнодорожных билетов",
     lifespan=lifespan
 )
+
+# Session Middleware - ВАЖНО для SQLAdmin!
+app.add_middleware(SessionMiddleware, secret_key="your-secret-key-change-me")
 
 # CORS
 from fastapi.middleware.cors import CORSMiddleware
@@ -117,7 +121,10 @@ try:
     # SQLAdmin Authentication
     class AdminAuth(AuthenticationBackend):
         async def login(self, username: str, password: str, request: Request) -> bool:
-            return password == "01020304"
+            if password == "01020304":
+                request.session["admin_token"] = "admin_authenticated"
+                return True
+            return False
 
         async def logout(self, request: Request) -> bool:
             request.session.clear()
@@ -174,9 +181,11 @@ try:
     logger.info("🔐 Пароль для входа: 01020304")
     
 except Exception as e:
-    logger.warning(f"⚠️ Ошибка SQLAdmin: {e}")
+    logger.error(f"❌ Ошибка SQLAdmin: {e}")
+    import traceback
+    traceback.print_exc()
 
-# Главная страница
+# Главная страница - всегда возвращает index.html (фронтенд сам будет проверять токен)
 @app.get("/")
 async def root():
     html_file = static_dir / "index.html"
