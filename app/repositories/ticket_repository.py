@@ -27,15 +27,14 @@ class TrainRepository:
             select(Train).where(
                 and_(
                     Train.route_from == route_from,
-                    Train.route_to == route_to,
-                    Train.is_active == True
+                    Train.route_to == route_to
                 )
             )
         )
         return result.scalars().all()
     
     async def get_all_trains(self) -> List[Train]:
-        result = await self.session.execute(select(Train).where(Train.is_active == True))
+        result = await self.session.execute(select(Train))
         return result.scalars().all()
 
 class WagonRepository:
