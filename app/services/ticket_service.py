@@ -121,6 +121,10 @@ class SeatService:
         """Зарезервировать место"""
         return await self.seat_repo.reserve_seat(seat_id)
     
+    async def release_seat(self, seat_id: int) -> Seat:
+        """Освободить место (отменить резервацию)"""
+        return await self.seat_repo.release_seat(seat_id)
+    
     async def count_available_seats(self, wagon_id: int) -> int:
         """Подсчитать количество свободных мест"""
         available = await self.get_available_seats(wagon_id)
@@ -192,6 +196,10 @@ class TicketService:
     async def get_user_tickets(self, passenger_email: str) -> List[Ticket]:
         """Получить все билеты пассажира"""
         return await self.ticket_repo.get_user_tickets(passenger_email)
+    
+    async def delete_ticket(self, ticket_id: int) -> bool:
+        """Удалить билет"""
+        return await self.ticket_repo.delete_ticket(ticket_id)
     
     async def pay_ticket(self, ticket_id: int) -> Ticket:
         """Оплатить билет"""
