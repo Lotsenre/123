@@ -1,5 +1,5 @@
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, and_, or_
+from sqlalchemy import select, and_, or_, delete
 from datetime import datetime, date
 from typing import List, Optional
 from app.models.tickets import Train, Wagon, Seat, Ticket
@@ -115,6 +115,16 @@ class SeatRepository:
             await self.session.commit()
             await self.session.refresh(seat)
         return seat
+    
+    async def release_seat(self, seat_id: int) -> Seat:
+        """Освободить место (отменить резервацию)"""
+        seat = await self.get_seat(seat_id)
+        if seat:
+            seat.is_reserved = False
+            seat.is_available = True
+            await self.session.commit()
+            await self.session.refresh(seat)
+        return seat
 
 class TicketRepository:
     def __init__(self, session: AsyncSession):
@@ -151,6 +161,15 @@ class TicketRepository:
             await self.session.commit()
             await self.session.refresh(ticket)
         return ticket
+    
+    async def delete_ticket(self, ticket_id: int) -> bool:
+        """Удалить билет"""
+        ticket = await self.get_ticket(ticket_id)
+        if ticket:
+            await self.session.delete(ticket)
+            await self.session.commit()
+            return True
+        return False
     
     async def get_tickets_by_train(self, train_id: int) -> List[Ticket]:
         result = await self.session.execute(
