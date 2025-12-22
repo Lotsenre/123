@@ -121,7 +121,11 @@ try:
     
     # SQLAdmin Authentication
     class AdminAuth(AuthenticationBackend):
-        async def login(self, username: str, password: str, request: Request) -> bool:
+        async def login(self, request: Request) -> bool:
+            form = await request.form()
+            password = form.get("password", "")
+            
+            # Проверяем только пароль
             if password == "01020304":
                 request.session["admin_token"] = "admin_authenticated"
                 return True
@@ -199,7 +203,7 @@ async def health():
     return {"status": "ok", "service": "wagono-mesto"}
 
 if __name__ == "__main__":
-    logger.info("🚂 Запуск сервера ВагоноМесто...")
+    logger.info("🚗 Запуск сервера ВагоноМесто...")
     uvicorn.run(
         app=app,
         host="0.0.0.0",
