@@ -47,7 +47,8 @@ app = FastAPI(
 )
 
 # Session Middleware - ВАЖНО для SQLAdmin!
-app.add_middleware(SessionMiddleware, secret_key="your-secret-key-change-me")
+SESSION_SECRET = "wagono-mesto-admin-secret-key-01020304"
+app.add_middleware(SessionMiddleware, secret_key=SESSION_SECRET)
 
 # CORS
 from fastapi.middleware.cors import CORSMiddleware
@@ -166,7 +167,7 @@ try:
         engine=engine,
         title="Админ Панель - ВагоноМесто",
         logo_url="https://cdn-icons-png.flaticon.com/512/4641/4641073.png",
-        authentication_backend=AdminAuth()
+        authentication_backend=AdminAuth(secret_key=SESSION_SECRET)
     )
     
     admin.add_view(UserAdmin)
