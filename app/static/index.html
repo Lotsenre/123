@@ -1403,7 +1403,7 @@
                     setTimeout(() => showAppScreen(), 1000);
                 } else {
                     const error = await response.json();
-                    messageEl.textContent = '✗ ' + (error.detail || 'Ошибка входа');
+                    messageEl.textContent = '✗ ' + (error.detail || 'Ошибка вохда');
                     messageEl.classList.add('error');
                     messageEl.classList.remove('success');
                 }
@@ -1492,20 +1492,30 @@
             }
 
             try {
-                const response = await fetch(`${API_BASE}/trains/search?route_from=${from}&route_to=${to}`, {
+                const url = `${API_BASE}/trains/search?route_from=${encodeURIComponent(from)}&route_to=${encodeURIComponent(to)}`;
+                console.log('🚂 Поиск билетов:', url);
+                
+                const response = await fetch(url, {
                     headers: { 'Authorization': `Bearer ${accessToken}` }
                 });
+                
+                console.log('Статус:', response.status);
                 const trains = await response.json();
+                console.log('Полученные поезда:', trains);
                 
                 const list = document.getElementById('trainsList');
                 list.innerHTML = '';
                 
-                if (trains.length === 0) {
-                    list.innerHTML = '<p style="color: rgba(224, 224, 224, 0.6); text-align: center; padding: 40px;">Билеты не найдены</p>';
+                if (!trains || trains.length === 0) {
+                    list.innerHTML = '<p style="color: rgba(224, 224, 224, 0.6); text-align: center; padding: 40px;">🚈 Билеты не найдены</p>';
+                    console.log('🚈 Поездов не найдено');
                     return;
                 }
 
-                trains.forEach(train => {
+                console.log('🚂 Найдено поездов:', trains.length);
+                
+                trains.forEach((train, idx) => {
+                    console.log(`Поезд ${idx+1}:`, train);
                     const card = document.createElement('div');
                     card.className = 'train-card';
                     card.innerHTML = `
@@ -1537,13 +1547,14 @@
                     list.appendChild(card);
                 });
             } catch (error) {
-                console.error('Error:', error);
+                console.error('Ошибка:', error);
                 alert('Ошибка при поиске билетов');
             }
         }
 
         function selectTrain(train) {
             selectedTrain = train;
+            console.log('Выбран поезд:', train);
             switchTab('booking');
         }
 
