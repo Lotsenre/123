@@ -1,10 +1,11 @@
 from datetime import datetime
-from typing import TYPE_CHECKING
+from typing import AsyncGenerator
 
 from sqlalchemy import NullPool, func, text
 from sqlalchemy.ext.asyncio import (
     async_sessionmaker,
     create_async_engine,
+    AsyncSession,
 )
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
@@ -26,3 +27,9 @@ class Base(DeclarativeBase):
     updated_at: Mapped[datetime] = mapped_column(
         server_default=func.now(), onupdate=func.now()
     )
+
+
+async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
+    """Зависимость для получения асинхронной сессии БД"""
+    async with async_session_maker() as session:
+        yield session
