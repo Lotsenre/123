@@ -602,6 +602,19 @@
             margin-bottom: 25px;
         }
 
+        .form-row > div {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-row label {
+            display: block;
+            margin-bottom: 8px;
+            color: #e0e0e0;
+            font-weight: 500;
+            font-size: 0.9em;
+        }
+
         .button {
             padding: 14px 40px;
             background: linear-gradient(135deg, #00d4ff 0%, #7c3aed 100%);
@@ -613,6 +626,7 @@
             font-weight: 600;
             transition: all 0.3s ease;
             box-shadow: 0 10px 30px rgba(0, 212, 255, 0.3);
+            width: 100%;
         }
 
         .button:hover, .button:active {
@@ -991,11 +1005,12 @@
             transition: color 0.3s ease;
         }
 
-        /* MOBILE RESPONSIVE STYLES */
+        /* IMPROVED MOBILE RESPONSIVE STYLES */
         @media (max-width: 768px) {
             .auth-container {
                 padding: 40px 25px;
                 margin: 10px;
+                max-width: 100%;
             }
 
             .auth-logo {
@@ -1012,14 +1027,21 @@
 
             header {
                 padding: 15px 20px;
+                gap: 15px;
+                flex-wrap: wrap;
             }
 
             header h1 {
                 font-size: 1.3em;
+                order: 1;
+                width: 100%;
             }
 
             .user-info {
                 gap: 10px;
+                order: 2;
+                width: 100%;
+                justify-content: flex-end;
             }
 
             .user-email {
@@ -1039,6 +1061,7 @@
             .tabs-bar {
                 padding: 10px 15px;
                 gap: 2px;
+                overflow-x: auto;
             }
 
             .tab-button {
@@ -1052,6 +1075,7 @@
 
             .container {
                 padding: 20px 15px;
+                max-width: 100%;
             }
 
             h2 {
@@ -1066,6 +1090,7 @@
             .form-row {
                 grid-template-columns: 1fr;
                 gap: 15px;
+                margin-bottom: 15px;
             }
 
             .train-card {
@@ -1135,6 +1160,7 @@
 
             .button {
                 padding: 12px 30px;
+                width: 100%;
             }
 
             .support-item {
@@ -1149,6 +1175,7 @@
         @media (max-width: 480px) {
             .auth-container {
                 padding: 30px 20px;
+                max-width: 100%;
             }
 
             .auth-logo {
@@ -1159,12 +1186,22 @@
                 font-size: 1.3em;
             }
 
+            header {
+                padding: 12px 15px;
+            }
+
             header h1 {
-                font-size: 1.1em;
+                font-size: 1.05em;
+            }
+
+            .logout-btn {
+                padding: 6px 12px;
+                font-size: 0.75em;
             }
 
             .tabs-bar {
                 padding: 8px 10px;
+                gap: 0;
             }
 
             .tab-button {
@@ -1183,28 +1220,76 @@
 
             h2 {
                 font-size: 1.2em;
+                margin-bottom: 15px;
             }
 
             .train-card {
                 padding: 15px 10px;
             }
 
+            .train-route {
+                font-size: 0.95em;
+            }
+
+            .train-details {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
+            }
+
             .seats-grid {
                 grid-template-columns: repeat(4, 1fr);
+                gap: 6px;
             }
 
             .wagon-selector, .seat-layout, .discount-section, .ticket-info {
                 padding: 15px 10px;
+            }
+
+            .detail-value {
+                font-size: 0.9em;
+            }
+
+            .button {
+                padding: 10px 20px;
+            }
+
+            .form-row label {
+                font-size: 0.85em;
             }
         }
 
         @media (max-width: 360px) {
             .seats-grid {
                 grid-template-columns: repeat(3, 1fr);
+                gap: 5px;
             }
 
             .train-details {
                 grid-template-columns: 1fr;
+                gap: 6px;
+            }
+
+            .detail-item {
+                padding: 6px;
+            }
+
+            .detail-label {
+                font-size: 0.7em;
+            }
+
+            .detail-value {
+                font-size: 0.85em;
+            }
+
+            .auth-container {
+                padding: 25px 15px;
+            }
+
+            .form-group input,
+            input,
+            select {
+                padding: 10px 12px;
+                font-size: 16px;
             }
         }
     </style>
@@ -1536,8 +1621,8 @@
                 
                 const cities = new Set();
                 trains.forEach(train => {
-                    cities.add(train.departure_city);
-                    cities.add(train.arrival_city);
+                    cities.add(train.route_from);
+                    cities.add(train.route_to);
                 });
                 
                 const citiesArray = Array.from(cities).sort();
@@ -1616,26 +1701,26 @@
             listEl.innerHTML = trains.map(train => `
                 <div class="train-card" onclick="selectTrain(${train.id})">
                     <div class="train-header">
-                        <span class="train-number">Поезд №${train.number}</span>
+                        <span class="train-number">Поезд №${train.train_number}</span>
                         <span class="train-price">от ${train.base_price} ₽</span>
                     </div>
-                    <div class="train-route">${train.departure_city} → ${train.arrival_city}</div>
+                    <div class="train-route">${train.route_from} → ${train.route_to}</div>
                     <div class="train-details">
                         <div class="detail-item">
                             <div class="detail-label">Отправление</div>
-                            <div class="detail-value">${train.departure_time}</div>
+                            <div class="detail-value">${new Date(train.departure_time).toLocaleTimeString('ru-RU', {hour: '2-digit', minute:'2-digit'})}</div>
                         </div>
                         <div class="detail-item">
                             <div class="detail-label">Прибытие</div>
-                            <div class="detail-value">${train.arrival_time}</div>
+                            <div class="detail-value">${new Date(train.arrival_time).toLocaleTimeString('ru-RU', {hour: '2-digit', minute:'2-digit'})}</div>
                         </div>
                         <div class="detail-item">
                             <div class="detail-label">Длительность</div>
-                            <div class="detail-value">${train.duration}</div>
+                            <div class="detail-value">${train.duration_hours} ч.</div>
                         </div>
                         <div class="detail-item">
-                            <div class="detail-label">Свободных мест</div>
-                            <div class="detail-value">${train.available_seats}</div>
+                            <div class="detail-label">Вагонов</div>
+                            <div class="detail-value">${train.wagons ? train.wagons.length : 0}</div>
                         </div>
                     </div>
                 </div>
@@ -1653,21 +1738,21 @@
                 <div class="train-card">
                     <div class="train-header">
                         <span class="train-number">Билет №${ticket.ticket_number}</span>
-                        <span class="train-price">${ticket.price} ₽</span>
+                        <span class="train-price">${ticket.final_price} ₽</span>
                     </div>
-                    <div class="train-route">${ticket.train.departure_city} → ${ticket.train.arrival_city}</div>
+                    <div class="train-route">${ticket.train.route_from} → ${ticket.train.route_to}</div>
                     <div class="train-details">
                         <div class="detail-item">
                             <div class="detail-label">Поезд</div>
-                            <div class="detail-value">№${ticket.train.number}</div>
+                            <div class="detail-value">№${ticket.train.train_number}</div>
                         </div>
                         <div class="detail-item">
                             <div class="detail-label">Вагон/Место</div>
-                            <div class="detail-value">${ticket.seat.wagon.number}/${ticket.seat.seat_number}</div>
+                            <div class="detail-value">${ticket.wagon.wagon_number}/${ticket.seat.seat_number}</div>
                         </div>
                         <div class="detail-item">
                             <div class="detail-label">Тип вагона</div>
-                            <div class="detail-value">${ticket.seat.wagon.wagon_type}</div>
+                            <div class="detail-value">${ticket.wagon.wagon_type}</div>
                         </div>
                         <div class="detail-item">
                             <div class="detail-label">Статус</div>
