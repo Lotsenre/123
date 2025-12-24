@@ -124,7 +124,7 @@ celerybeat.pid
 *.sage.py
 
 # Environments
-.env
+# .env  # Закоммичен для быстрого развертывания
 .venv
 env/
 venv/
@@ -178,9 +178,12 @@ pyrightconfig.json
 .idea
 config.yml
 
-# Database files
-*.db
+# Database files (закоммичены для быстрого развертывания)
+# *.db
 nul
 
 # Test files
 full_test.py
+
+# Claude Code directory
+.claude/
