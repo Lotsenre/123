@@ -124,7 +124,11 @@ class SeatService:
     async def release_seat(self, seat_id: int) -> Seat:
         """Освободить место (отменить резервацию)"""
         return await self.seat_repo.release_seat(seat_id)
-    
+
+    async def try_reserve_seat(self, seat_id: int) -> bool:
+        """Атомарная попытка забронировать место (защита от race condition)"""
+        return await self.seat_repo.try_reserve_seat(seat_id)
+
     async def count_available_seats(self, wagon_id: int) -> int:
         """Подсчитать количество свободных мест"""
         available = await self.get_available_seats(wagon_id)
@@ -156,14 +160,17 @@ class TicketService:
             discount_type=discount_type
         )
     
-    async def create_ticket(self, 
+    async def create_ticket(self,
                           ticket_data: TicketCreate,
                           base_price: float,
                           final_price: float,
                           train: Train) -> Ticket:
         """Создать билет и зарезервировать место"""
+        # Получаем значение discount_type (может быть enum или str)
+        discount_type_value = ticket_data.discount_type.value if hasattr(ticket_data.discount_type, 'value') else ticket_data.discount_type
+
         # Рассчитать скидку
-        _, discount_percent = DiscountService.calculate_final_price(base_price, ticket_data.discount_type)
+        _, discount_percent = DiscountService.calculate_final_price(base_price, discount_type_value)
         
         # Создать билет
         ticket = Ticket(
@@ -173,7 +180,7 @@ class TicketService:
             passenger_name=ticket_data.passenger_name,
             passenger_email=ticket_data.passenger_email,
             passenger_phone=ticket_data.passenger_phone,
-            discount_type=ticket_data.discount_type,
+            discount_type=discount_type_value,
             discount_percent=discount_percent,
             base_price=base_price,
             final_price=final_price,
@@ -182,11 +189,8 @@ class TicketService:
             arrival_time=train.arrival_time,
             is_paid=False
         )
-        
-        # Зарезервировать место
-        await self.seat_repo.reserve_seat(ticket_data.seat_id)
-        
-        # Сохранить билет
+
+        # Сохранить билет (место уже зарезервировано через try_reserve_seat в API)
         return await self.ticket_repo.create_ticket(ticket)
     
     async def get_ticket(self, ticket_id: int) -> Optional[Ticket]:

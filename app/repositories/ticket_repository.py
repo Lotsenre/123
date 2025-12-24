@@ -125,6 +125,29 @@ class SeatRepository:
             await self.session.refresh(seat)
         return seat
 
+    async def try_reserve_seat(self, seat_id: int) -> bool:
+        """Атомарная попытка забронировать место (защита от race condition)"""
+        try:
+            # Используем SELECT FOR UPDATE для блокировки строки
+            result = await self.session.execute(
+                select(Seat)
+                .where(Seat.id == seat_id)
+                .with_for_update()
+            )
+            seat = result.scalar_one_or_none()
+
+            if not seat or not seat.is_available or seat.is_reserved:
+                return False
+
+            # Бронируем место
+            seat.is_reserved = True
+            seat.is_available = False
+            await self.session.commit()
+            return True
+        except Exception:
+            await self.session.rollback()
+            return False
+
 class TicketRepository:
     def __init__(self, session: AsyncSession):
         self.session = session

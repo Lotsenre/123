@@ -2,7 +2,7 @@ import uvicorn
 import logging
 from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, JSONResponse
 from pathlib import Path
 from contextlib import asynccontextmanager
 from starlette.middleware.sessions import SessionMiddleware
@@ -11,9 +11,12 @@ from app.api.sample import router as sample_router
 from app.api.auth import router as auth_router
 from app.api.roles import router as role_router
 from app.api.tickets import router as tickets_router
-from app.database.database import Base, engine
+from app.database.database import Base, engine, async_session_maker
+from app.models.roles import RoleModel
+from sqlalchemy import select
 from app.services.auth import AuthService
 from app.exceptions.auth import InvalidJWTTokenError, JWTTokenExpiredError
+from app.config import settings
 
 # Логирование
 logging.basicConfig(
@@ -30,10 +33,22 @@ async def lifespan(app: FastAPI):
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
     logger.info("✅ Таблицы успешно созданы")
-    
+
+    # Создание ролей по умолчанию
+    async with async_session_maker() as session:
+        result = await session.execute(select(RoleModel))
+        existing_roles = result.scalars().all()
+        if not existing_roles:
+            logger.info("📋 Создание ролей по умолчанию...")
+            session.add(RoleModel(id=1, name="user"))
+            session.add(RoleModel(id=2, name="admin"))
+            session.add(RoleModel(id=3, name="moderator"))
+            await session.commit()
+            logger.info("✅ Роли созданы")
+
     # Здесь выполняется основной код приложения
     yield
-    
+
     # Shutdown - очистка при выключении
     logger.info("😴 Приложение останавливается...")
     await engine.dispose()
@@ -46,56 +61,21 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-# Session Middleware - ВАЖНО для SQLAdmin!
-SESSION_SECRET = "wagono-mesto-admin-secret-key-01020304"
-app.add_middleware(SessionMiddleware, secret_key=SESSION_SECRET)
-
-# CORS
+# Middleware
 from fastapi.middleware.cors import CORSMiddleware
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
-    allow_credentials=True,
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Middleware для проверки аутентификации на API routes
-@app.middleware("http")
-async def auth_middleware(request: Request, call_next):
-    # Пропускаем auth routes, static files и public endpoints
-    if (request.url.path.startswith("/api/auth") or 
-        request.url.path.startswith("/static") or 
-        request.url.path == "/" or 
-        request.url.path == "" or 
-        request.url.path == "/health" or
-        request.url.path.startswith("/admin") or  # SQLAdmin routes
-        # Разрешаем публичные эндпоинты для поиска и информации
-        request.url.path.startswith("/api/tickets/trains/search") or
-        request.url.path.startswith("/api/tickets/trains") or
-        request.url.path.startswith("/api/tickets/discounts")):
-        return await call_next(request)
-    
-    # Для остальных API routes проверяем токен
-    if request.url.path.startswith("/api/"):
-        auth_header = request.headers.get("Authorization")
-        if not auth_header or not auth_header.startswith("Bearer "):
-            return FileResponse(
-                Path(__file__).parent / "app" / "static" / "index.html",
-                status_code=200
-            )
-        
-        token = auth_header.replace("Bearer ", "")
-        try:
-            AuthService.decode_token(token)
-        except (InvalidJWTTokenError, JWTTokenExpiredError):
-            return FileResponse(
-                Path(__file__).parent / "app" / "static" / "index.html",
-                status_code=200
-            )
-    
-    return await call_next(request)
+app.add_middleware(SessionMiddleware, secret_key=settings.SESSION_SECRET)
+
+# Аутентификация реализована через dependencies в tickets.py
+# Публичные маршруты не требуют токена, защищённые используют CurrentUserDep
 
 # Маршруты API
 app.include_router(sample_router)
@@ -111,13 +91,36 @@ if static_dir.exists():
 else:
     logger.warning(f"⚠️ Директория статических файлов не найдена: {static_dir}")
 
-# SQLAdmin
+# SQLAdmin с аутентификацией
 try:
     from sqladmin import Admin, ModelView
+    from sqladmin.authentication import AuthenticationBackend
+    from starlette.requests import Request as StarletteRequest
+    from starlette.responses import RedirectResponse
     from app.models.users import UserModel
     from app.models.tickets import Train, Wagon, Seat, Ticket
     from app.models.roles import RoleModel
-    
+
+    # Аутентификация для админ-панели
+    class AdminAuth(AuthenticationBackend):
+        async def login(self, request: StarletteRequest) -> bool:
+            form = await request.form()
+            username = form.get("username")
+            password = form.get("password")
+
+            # Проверяем логин/пароль из конфига
+            if username == settings.ADMIN_USERNAME and password == settings.ADMIN_PASSWORD:
+                request.session.update({"admin_authenticated": True})
+                return True
+            return False
+
+        async def logout(self, request: StarletteRequest) -> bool:
+            request.session.clear()
+            return True
+
+        async def authenticate(self, request: StarletteRequest) -> bool:
+            return request.session.get("admin_authenticated", False)
+
     # SQLAdmin ModelViews
     class UserAdmin(ModelView, model=UserModel):
         name = "Пользователь"
@@ -131,7 +134,6 @@ try:
         name_plural = "Поезда"
         page_size = 10
         page_size_options = [10, 25, 50]
-        # Отключаем удаление поездов для безопасности
         can_delete = False
 
     class WagonAdmin(ModelView, model=Wagon):
@@ -151,32 +153,34 @@ try:
         name_plural = "Билеты"
         page_size = 10
         page_size_options = [10, 25, 50]
-        column_exclude_list = []  # Показываем все поля
+        column_exclude_list = []
 
     class RoleAdmin(ModelView, model=RoleModel):
         name = "Роль"
         name_plural = "Роли"
         page_size = 10
         page_size_options = [10, 25, 50]
-    
-    # Регистрация SQLAdmin БЕЗ аутентификации
+
+    # Регистрация SQLAdmin С аутентификацией
+    authentication_backend = AdminAuth(secret_key=settings.SESSION_SECRET)
     admin = Admin(
         app=app,
         engine=engine,
         title="Админ Панель - ВагоноМесто",
-        logo_url="https://cdn-icons-png.flaticon.com/512/4641/4641073.png"
+        logo_url="https://cdn-icons-png.flaticon.com/512/4641/4641073.png",
+        authentication_backend=authentication_backend
     )
-    
+
     admin.add_view(UserAdmin)
     admin.add_view(TrainAdmin)
     admin.add_view(WagonAdmin)
     admin.add_view(SeatAdmin)
     admin.add_view(TicketAdmin)
     admin.add_view(RoleAdmin)
-    
+
     logger.info("✅ SQLAdmin зарегистрирован на /admin")
-    logger.info("🔓 Админ панель открыта без пароля!")
-    
+    logger.info("🔐 Админ панель защищена паролем (логин: admin)")
+
 except Exception as e:
     logger.error(f"❌ Ошибка SQLAdmin: {e}")
     import traceback
@@ -197,8 +201,9 @@ async def health():
 
 if __name__ == "__main__":
     logger.info("🚂 Запуск сервера ВагоноМесто...")
+    # reload=True требует указания модуля как строки, иначе кеширует старый код
     uvicorn.run(
-        app=app,
+        "main:app",
         host="0.0.0.0",
         port=8000,
         reload=True,

@@ -177,3 +177,10 @@ pyrightconfig.json
 
 .idea
 config.yml
+
+# Database files
+*.db
+nul
+
+# Test files
+full_test.py

@@ -920,15 +920,295 @@
                 margin-bottom: 10px;
             }
         }
+
+        /* MODAL STYLES */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            padding: 20px;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: rgba(30, 35, 45, 0.95);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        body.light-mode .modal {
+            background: rgba(255, 255, 255, 0.98);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        body.light-mode .modal-header {
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            background: linear-gradient(135deg, #00d4ff 0%, #7c3aed 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5em;
+            cursor: pointer;
+            color: #e0e0e0;
+            transition: all 0.3s ease;
+        }
+
+        body.light-mode .modal-close {
+            color: #333;
+        }
+
+        .modal-close:hover {
+            color: #ef4444;
+            transform: scale(1.1);
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .modal-section {
+            margin-bottom: 20px;
+        }
+
+        .modal-section h4 {
+            margin-bottom: 12px;
+            color: #00d4ff;
+            font-size: 0.9em;
+        }
+
+        .wagon-list, .seat-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 8px;
+        }
+
+        .wagon-btn, .seat-btn {
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s ease;
+            color: #e0e0e0;
+        }
+
+        body.light-mode .wagon-btn, body.light-mode .seat-btn {
+            background: rgba(0, 0, 0, 0.03);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            color: #333;
+        }
+
+        .wagon-btn:hover, .seat-btn:hover {
+            background: rgba(0, 212, 255, 0.1);
+            border-color: rgba(0, 212, 255, 0.3);
+        }
+
+        .wagon-btn.selected, .seat-btn.selected {
+            background: rgba(0, 212, 255, 0.2);
+            border-color: #00d4ff;
+            color: #00d4ff;
+        }
+
+        .seat-btn.unavailable {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: rgba(239, 68, 68, 0.3);
+            color: rgba(239, 68, 68, 0.5);
+            cursor: not-allowed;
+        }
+
+        .wagon-type {
+            font-size: 0.7em;
+            opacity: 0.7;
+        }
+
+        .wagon-price {
+            font-size: 0.85em;
+            color: #00d4ff;
+            font-weight: 600;
+        }
+
+        .discount-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .discount-btn {
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.3s ease;
+            color: #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        body.light-mode .discount-btn {
+            background: rgba(0, 0, 0, 0.03);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            color: #333;
+        }
+
+        .discount-btn:hover {
+            background: rgba(0, 212, 255, 0.1);
+            border-color: rgba(0, 212, 255, 0.3);
+        }
+
+        .discount-btn.selected {
+            background: rgba(0, 212, 255, 0.2);
+            border-color: #00d4ff;
+        }
+
+        .discount-percent {
+            color: #10b981;
+            font-weight: 600;
+        }
+
+        .price-summary {
+            background: rgba(0, 212, 255, 0.1);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+
+        .price-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 0.9em;
+        }
+
+        .price-row.total {
+            font-size: 1.1em;
+            font-weight: 700;
+            color: #00d4ff;
+            border-top: 1px solid rgba(0, 212, 255, 0.2);
+            padding-top: 10px;
+            margin-top: 10px;
+            margin-bottom: 0;
+        }
+
+        .modal-footer {
+            padding: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        body.light-mode .modal-footer {
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .buy-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #00d4ff 0%, #7c3aed 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .buy-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.3);
+        }
+
+        .buy-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
     </style>
 </head>
 <body>
+    <!-- TICKET MODAL -->
+    <div class="modal-overlay" id="ticketModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modalTrainTitle">Оформление билета</h3>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-section">
+                    <h4>🚃 Выберите вагон</h4>
+                    <div class="wagon-list" id="wagonList"></div>
+                </div>
+                <div class="modal-section" id="seatSection" style="display: none;">
+                    <h4>💺 Выберите место</h4>
+                    <div class="seat-list" id="seatList"></div>
+                </div>
+                <div class="modal-section" id="discountSection" style="display: none;">
+                    <h4>🏷️ Скидка</h4>
+                    <div class="discount-list" id="discountList"></div>
+                </div>
+                <div class="price-summary" id="priceSummary" style="display: none;">
+                    <div class="price-row">
+                        <span>Базовая цена:</span>
+                        <span id="basePrice">0 ₽</span>
+                    </div>
+                    <div class="price-row">
+                        <span>Скидка:</span>
+                        <span id="discountAmount">0 ₽</span>
+                    </div>
+                    <div class="price-row total">
+                        <span>Итого:</span>
+                        <span id="finalPrice">0 ₽</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="buy-btn" id="buyBtn" disabled onclick="buyTicket()">Купить билет</button>
+            </div>
+        </div>
+    </div>
+
     <!-- AUTH SCREEN -->
     <div class="auth-screen" id="authScreen">
         <div class="auth-container">
             <div class="auth-header">
                 <div class="auth-logo" id="authLogo">
-                    <img src="https://agi-prod-file-upload-public-main-use1.s3.amazonaws.com/c6815e61-7ef9-436e-a976-b7bb7f518017" alt="Logo" style="animation: float 3s ease-in-out infinite;">
+                    🚂
                 </div>
                 <h2 class="auth-title">ВагоноМесто</h2>
                 <p class="auth-subtitle">Сервис покупки ж/д билетов</p>
@@ -953,6 +1233,10 @@
             </form>
 
             <form class="auth-form" id="registerForm" data-tab="register">
+                <div class="form-group">
+                    <label>Имя</label>
+                    <input type="text" id="registerName" placeholder="Ваше имя" required>
+                </div>
                 <div class="form-group">
                     <label>Email</label>
                     <input type="email" id="registerEmail" placeholder="your@email.com" required>
@@ -985,7 +1269,7 @@
 
             <div class="tabs-bar">
                 <button class="tab-button active" data-tab="search">Поиск</button>
-                <button class="tab-button" data-tab="my-tickets">Билеты</button>
+                <button class="tab-button" data-tab="myTickets">Билеты</button>
                 <button class="tab-button" data-tab="about">О нас</button>
             </div>
 
@@ -1055,29 +1339,54 @@
         let authToken = null;
         const API_BASE_URL = 'http://localhost:8000/api';
 
+        // Переменные для покупки билета
+        let selectedTrain = null;
+        let selectedWagon = null;
+        let selectedSeat = null;
+        let selectedDiscount = 'none';
+        let currentBasePrice = 0;
+
         document.addEventListener('DOMContentLoaded', () => {
+            console.log('DOM loaded, initializing app...');
             initializeApp();
         });
+
+        window.onerror = function(msg, url, line, col, error) {
+            console.error('JS Error:', msg, 'at line', line);
+            return false;
+        };
 
         function initializeApp() {
             const savedToken = localStorage.getItem('authToken');
             const savedUser = localStorage.getItem('currentUser');
-            
-            if (savedToken && savedUser) {
-                authToken = savedToken;
-                currentUser = JSON.parse(savedUser);
-                showAppScreen();
-                loadCities();
-                loadMyTickets();
+
+            // Проверяем что токен и данные пользователя валидны (не null, не "undefined")
+            if (savedToken && savedUser && savedUser !== 'undefined' && savedToken !== 'undefined') {
+                try {
+                    authToken = savedToken;
+                    currentUser = JSON.parse(savedUser);
+                    showAppScreen();
+                    loadCities();
+                    loadMyTickets();
+                } catch (e) {
+                    console.error('Ошибка парсинга данных пользователя:', e);
+                    localStorage.removeItem('authToken');
+                    localStorage.removeItem('currentUser');
+                    showAuthScreen();
+                }
             } else {
+                // Очищаем невалидные данные
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('currentUser');
                 showAuthScreen();
             }
-            
+
             setupEventListeners();
             loadTheme();
         }
 
         function setupEventListeners() {
+            console.log('Setting up event listeners...');
             document.querySelectorAll('.auth-tab-btn').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     document.querySelectorAll('.auth-tab-btn').forEach(b => b.classList.remove('active'));
@@ -1119,9 +1428,11 @@
 
         async function handleLogin(e) {
             e.preventDefault();
+            console.log('handleLogin called');
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
             const messageEl = document.getElementById('loginMessage');
+            console.log('Login attempt for:', email);
             
             try {
                 const response = await fetch(`${API_BASE_URL}/auth/login`, {
@@ -1134,9 +1445,20 @@
                 
                 if (response.ok) {
                     authToken = data.access_token;
-                    currentUser = data.user;
                     localStorage.setItem('authToken', authToken);
-                    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+
+                    // Получить данные пользователя
+                    const userResponse = await fetch(`${API_BASE_URL}/auth/me`, {
+                        headers: { 'Authorization': `Bearer ${authToken}` }
+                    });
+                    if (userResponse.ok) {
+                        currentUser = await userResponse.json();
+                        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                    } else {
+                        currentUser = { email: email };
+                        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                    }
+
                     messageEl.className = 'auth-message success';
                     messageEl.textContent = '✅ Вход выполнен!';
                     setTimeout(() => {
@@ -1156,22 +1478,25 @@
 
         async function handleRegister(e) {
             e.preventDefault();
+            console.log('handleRegister called');
+            const name = document.getElementById('registerName').value;
             const email = document.getElementById('registerEmail').value;
             const password = document.getElementById('registerPassword').value;
             const passwordConfirm = document.getElementById('registerPasswordConfirm').value;
             const messageEl = document.getElementById('registerMessage');
-            
+            console.log('Register attempt for:', email);
+
             if (password !== passwordConfirm) {
                 messageEl.className = 'auth-message error';
                 messageEl.textContent = '❌ Пароли не совпадают';
                 return;
             }
-            
+
             try {
                 const response = await fetch(`${API_BASE_URL}/auth/register`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, password })
+                    body: JSON.stringify({ name, email, password, role_id: 1 })
                 });
                 
                 const data = await response.json();
@@ -1228,18 +1553,18 @@
             const departure = document.getElementById('departureCity').value;
             const arrival = document.getElementById('arrivalCity').value;
             const date = document.getElementById('travelDate').value;
-            
-            if (!departure || !arrival || !date) {
-                showError('searchError', '❌ Заполните все поля');
+
+            if (!departure || departure === 'Город отправления' || !arrival || arrival === 'Город прибытия') {
+                showError('searchError', '❌ Выберите города');
                 return;
             }
             if (departure === arrival) {
                 showError('searchError', '❌ Выберите разные города');
                 return;
             }
-            
+
             try {
-                const response = await fetch(`${API_BASE_URL}/tickets/trains/search?departure_city=${departure}&arrival_city=${arrival}&travel_date=${date}`);
+                const response = await fetch(`${API_BASE_URL}/tickets/trains/search?route_from=${encodeURIComponent(departure)}&route_to=${encodeURIComponent(arrival)}`);
                 const trains = await response.json();
                 if (trains.length === 0) {
                     showError('searchError', '❌ Поезда не найдены');
@@ -1267,10 +1592,14 @@
             }
         }
 
+        // Сохраняем найденные поезда для использования при клике
+        let foundTrains = [];
+
         function displayTrains(trains) {
+            foundTrains = trains;
             const listEl = document.getElementById('trainsList');
-            listEl.innerHTML = trains.map(train => `
-                <div class="train-card">
+            listEl.innerHTML = trains.map((train, index) => `
+                <div class="train-card" onclick="openTicketModal(${index})" style="cursor: pointer;">
                     <div class="train-header">
                         <span class="train-number">Поезд №${train.train_number}</span>
                         <span class="train-price">от ${train.base_price}₽</span>
@@ -1282,8 +1611,8 @@
                             <div class="detail-value">${new Date(train.departure_time).toLocaleTimeString('ru-RU', {hour: '2-digit', minute:'2-digit'})}</div>
                         </div>
                         <div class="detail-item">
-                            <div class="detail-label">Вагонов</div>
-                            <div class="detail-value">${train.wagons ? train.wagons.length : 0}</div>
+                            <div class="detail-label">Мест</div>
+                            <div class="detail-value">${train.available_seats_count || 0}</div>
                         </div>
                     </div>
                 </div>
@@ -1293,16 +1622,28 @@
         function displayMyTickets(tickets) {
             const listEl = document.getElementById('myTicketsList');
             if (tickets.length === 0) {
-                listEl.innerHTML = '<p style="text-align: center; color: rgba(224, 224, 224, 0.6);">Нет билетов</p>';
+                listEl.innerHTML = '<p style="text-align: center; color: rgba(224, 224, 224, 0.6);">У вас пока нет билетов. Найдите поезд и купите билет!</p>';
                 return;
             }
             listEl.innerHTML = tickets.map(ticket => `
                 <div class="train-card">
                     <div class="train-header">
-                        <span class="train-number">Билет №${ticket.ticket_number}</span>
+                        <span class="train-number">🎫 ${ticket.ticket_number}</span>
                         <span class="train-price">${ticket.final_price}₽</span>
                     </div>
-                    <div class="train-route">${ticket.train.route_from} → ${ticket.train.route_to}</div>
+                    <div class="train-route">Поезд №${ticket.train_id} • Вагон ${ticket.wagon_id} • Место ${ticket.seat_id}</div>
+                    <div class="train-details">
+                        <div class="detail-item">
+                            <div class="detail-label">Пассажир</div>
+                            <div class="detail-value">${ticket.passenger_name}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Статус</div>
+                            <div class="detail-value" style="color: ${ticket.is_paid ? '#10b981' : '#f59e0b'}">
+                                ${ticket.is_paid ? '✓ Оплачен' : '⏳ Ожидает'}
+                            </div>
+                        </div>
+                    </div>
                 </div>
             `).join('');
         }
@@ -1338,6 +1679,241 @@
         function updateThemeToggle() {
             const isLightMode = document.body.classList.contains('light-mode');
             document.getElementById('themeToggle').textContent = isLightMode ? '☀️' : '🌙';
+        }
+
+        // ============= ФУНКЦИИ МОДАЛЬНОГО ОКНА =============
+
+        async function openTicketModal(trainIndex) {
+            selectedTrain = foundTrains[trainIndex];
+            selectedWagon = null;
+            selectedSeat = null;
+            selectedDiscount = 'none';
+
+            // Обновить заголовок
+            document.getElementById('modalTrainTitle').textContent =
+                `Поезд №${selectedTrain.train_number}: ${selectedTrain.route_from} → ${selectedTrain.route_to}`;
+
+            // Скрыть секции
+            document.getElementById('seatSection').style.display = 'none';
+            document.getElementById('discountSection').style.display = 'none';
+            document.getElementById('priceSummary').style.display = 'none';
+            document.getElementById('buyBtn').disabled = true;
+
+            // Загрузить вагоны
+            await loadWagons(selectedTrain.id);
+
+            // Показать модальное окно
+            document.getElementById('ticketModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('ticketModal').classList.remove('active');
+            selectedTrain = null;
+            selectedWagon = null;
+            selectedSeat = null;
+        }
+
+        // Закрытие при клике на оверлей
+        document.getElementById('ticketModal').addEventListener('click', (e) => {
+            if (e.target.id === 'ticketModal') {
+                closeModal();
+            }
+        });
+
+        async function loadWagons(trainId) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/tickets/trains/${trainId}/wagons`);
+                const wagons = await response.json();
+
+                const wagonTypes = {
+                    'platzkart': 'Плацкарт',
+                    'coupe': 'Купе',
+                    'suite': 'Люкс'
+                };
+
+                const wagonList = document.getElementById('wagonList');
+                if (wagons.length === 0) {
+                    wagonList.innerHTML = '<p style="color: rgba(224, 224, 224, 0.6);">Нет доступных вагонов</p>';
+                    return;
+                }
+
+                wagonList.innerHTML = wagons.map(wagon => `
+                    <div class="wagon-btn" onclick="selectWagon(${wagon.id}, '${wagon.wagon_type}', ${wagon.price_multiplier})">
+                        <div>Вагон ${wagon.wagon_number}</div>
+                        <div class="wagon-type">${wagonTypes[wagon.wagon_type] || wagon.wagon_type}</div>
+                        <div class="wagon-price">${Math.round(selectedTrain.base_price * wagon.price_multiplier)}₽</div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Ошибка загрузки вагонов:', error);
+            }
+        }
+
+        async function selectWagon(wagonId, wagonType, priceModifier) {
+            selectedWagon = { id: wagonId, type: wagonType, priceModifier: priceModifier };
+            selectedSeat = null;
+
+            // Обновить UI вагонов
+            document.querySelectorAll('.wagon-btn').forEach(btn => btn.classList.remove('selected'));
+            event.currentTarget.classList.add('selected');
+
+            // Рассчитать базовую цену
+            currentBasePrice = Math.round(selectedTrain.base_price * priceModifier);
+
+            // Загрузить места
+            await loadSeats(wagonId);
+
+            // Показать секцию мест
+            document.getElementById('seatSection').style.display = 'block';
+
+            // Скрыть секции ниже
+            document.getElementById('discountSection').style.display = 'none';
+            document.getElementById('priceSummary').style.display = 'none';
+            document.getElementById('buyBtn').disabled = true;
+        }
+
+        async function loadSeats(wagonId) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/tickets/wagons/${wagonId}/layout`);
+                const seats = await response.json();
+
+                const seatList = document.getElementById('seatList');
+                if (seats.length === 0) {
+                    seatList.innerHTML = '<p style="color: rgba(224, 224, 224, 0.6);">Нет мест</p>';
+                    return;
+                }
+
+                seatList.innerHTML = seats.map(seat => {
+                    const isAvailable = seat.is_available && !seat.is_reserved;
+                    return `
+                        <div class="seat-btn ${isAvailable ? '' : 'unavailable'}"
+                             onclick="${isAvailable ? `selectSeat(${seat.id}, ${seat.seat_number})` : ''}"
+                             title="${isAvailable ? 'Свободно' : 'Занято'}">
+                            ${seat.seat_number}
+                        </div>
+                    `;
+                }).join('');
+            } catch (error) {
+                console.error('Ошибка загрузки мест:', error);
+            }
+        }
+
+        function selectSeat(seatId, seatNumber) {
+            selectedSeat = { id: seatId, number: seatNumber };
+
+            // Обновить UI мест
+            document.querySelectorAll('.seat-btn').forEach(btn => btn.classList.remove('selected'));
+            event.currentTarget.classList.add('selected');
+
+            // Показать скидки
+            loadDiscounts();
+            document.getElementById('discountSection').style.display = 'block';
+
+            // Обновить цену
+            updatePrice();
+        }
+
+        function loadDiscounts() {
+            const discounts = [
+                { type: 'none', description: 'Без скидки', percent: 0 },
+                { type: 'child', description: 'Детский (0-12 лет)', percent: 50 },
+                { type: 'student', description: 'Студенческий', percent: 25 },
+                { type: 'pensioner', description: 'Пенсионный', percent: 40 }
+            ];
+
+            const discountList = document.getElementById('discountList');
+            discountList.innerHTML = discounts.map(d => `
+                <div class="discount-btn ${d.type === selectedDiscount ? 'selected' : ''}"
+                     onclick="selectDiscount('${d.type}', ${d.percent})">
+                    <span>${d.description}</span>
+                    <span class="discount-percent">${d.percent > 0 ? `-${d.percent}%` : ''}</span>
+                </div>
+            `).join('');
+        }
+
+        function selectDiscount(type, percent) {
+            selectedDiscount = type;
+
+            // Обновить UI скидок
+            document.querySelectorAll('.discount-btn').forEach(btn => btn.classList.remove('selected'));
+            event.currentTarget.classList.add('selected');
+
+            // Обновить цену
+            updatePrice();
+        }
+
+        function updatePrice() {
+            const discountPercents = {
+                'none': 0,
+                'child': 50,
+                'student': 25,
+                'pensioner': 40
+            };
+
+            const discountPercent = discountPercents[selectedDiscount] || 0;
+            const discountAmount = Math.round(currentBasePrice * discountPercent / 100);
+            const finalPrice = currentBasePrice - discountAmount;
+
+            document.getElementById('basePrice').textContent = `${currentBasePrice} ₽`;
+            document.getElementById('discountAmount').textContent = `-${discountAmount} ₽`;
+            document.getElementById('finalPrice').textContent = `${finalPrice} ₽`;
+
+            document.getElementById('priceSummary').style.display = 'block';
+            document.getElementById('buyBtn').disabled = false;
+        }
+
+        async function buyTicket() {
+            if (!selectedTrain || !selectedWagon || !selectedSeat) {
+                alert('Пожалуйста, выберите вагон и место');
+                return;
+            }
+
+            const buyBtn = document.getElementById('buyBtn');
+            buyBtn.disabled = true;
+            buyBtn.textContent = 'Оформление...';
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/tickets/create`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify({
+                        train_id: selectedTrain.id,
+                        wagon_id: selectedWagon.id,
+                        seat_id: selectedSeat.id,
+                        passenger_name: currentUser.name || currentUser.email,
+                        passenger_email: currentUser.email,
+                        passenger_phone: '',
+                        discount_type: selectedDiscount
+                    })
+                });
+
+                if (response.ok) {
+                    const ticket = await response.json();
+                    closeModal();
+                    alert(`Билет успешно оформлен! Номер: ${ticket.ticket_number}`);
+
+                    // Обновить список билетов
+                    loadMyTickets();
+
+                    // Переключиться на вкладку билетов
+                    document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                    document.querySelector('[data-tab="myTickets"]').classList.add('active');
+                    document.getElementById('myTicketsTab').classList.add('active');
+                } else {
+                    const error = await response.json();
+                    alert('Ошибка: ' + (error.detail || 'Не удалось оформить билет'));
+                }
+            } catch (error) {
+                console.error('Ошибка покупки:', error);
+                alert('Ошибка подключения к серверу');
+            } finally {
+                buyBtn.disabled = false;
+                buyBtn.textContent = 'Купить билет';
+            }
         }
     </script>
 </body>

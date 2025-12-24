@@ -23,9 +23,9 @@ async_session_maker_null_pool = async_sessionmaker(
 
 
 class Base(DeclarativeBase):
-    created_at: Mapped[datetime] = mapped_column(server_default=func.now())
+    created_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
     updated_at: Mapped[datetime] = mapped_column(
-        server_default=func.now(), onupdate=func.now()
+        default=datetime.utcnow, onupdate=datetime.utcnow
     )
 
 
